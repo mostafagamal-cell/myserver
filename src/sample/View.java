@@ -44,7 +44,6 @@ class View extends AnchorPane {
   protected final Circle circle1;
   protected final Label label1;
   protected final Label offlinelabe;
-  protected final Button button;
   protected final ListView<User> users;
   protected final CategoryAxis categoryAxis;
   protected final NumberAxis numberAxis;
@@ -66,7 +65,7 @@ class View extends AnchorPane {
       circle1 = new Circle();
       label1 = new Label();
       offlinelabe = new Label();
-      button = new Button();
+
       users = new ListView<User>();
       categoryAxis = new CategoryAxis();
       numberAxis = new NumberAxis();
@@ -165,17 +164,6 @@ class View extends AnchorPane {
       offlinelabe.setLayoutY(83.0);
       offlinelabe.setText("0");
 
-      AnchorPane.setRightAnchor(button, 26.0);
-      AnchorPane.setTopAnchor(button, 75.0);
-      button.setLayoutX(334.0);
-      button.setLayoutY(75.0);
-      button.setMnemonicParsing(false);
-      button.setPrefHeight(90.0);
-      button.setPrefWidth(440.0);
-      button.setStyle("-fx-background-radius: 25; -fx-border-radius: 25; -fx-background-color: cyan;");
-      button.setText("Score");
-      button.setTextOverrun(javafx.scene.control.OverrunStyle.CLIP);
-      button.setFont(new Font(27.0));
 
       categoryAxis.setSide(javafx.geometry.Side.BOTTOM);
 
@@ -210,7 +198,6 @@ class View extends AnchorPane {
       PlayerButton.getChildren().add(label1);
       PlayerButton.getChildren().add(offlinelabe);
       getChildren().add(PlayerButton);
-      getChildren().add(button);
       getChildren().add(barChart);
       SServerButton.setOnAction(e->{
           System.out.println("xxxxxxxxxxxxxxxxxx");
