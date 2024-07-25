@@ -163,7 +163,7 @@ class ServerTest {
 
     }
     @Test
-    public void signin_with_exists_sigin_test() throws IOException {
+    public void signin_with_exists_sigin_test() throws Exception {
         object.put(sample.types.type, sample.types.SignIn);
         object.put(sample.types.Username,"mostafa");
         object.put(sample.types.Password,"0");
@@ -171,6 +171,7 @@ class ServerTest {
         System.out.println(inputStream.readUTF());
         outputStream2.writeUTF(object.toString());
         System.out.println(inputStream2.readUTF());
+        Thread.sleep(7000 );
     }
     @Test
     public void signup_test() throws IOException {

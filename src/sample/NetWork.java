@@ -19,7 +19,7 @@ public class NetWork {
     }
 
     public void start() throws Exception {
-           JSONObject object1;
+            JSONObject object1;
             String message=server.dataInputStream.readUTF();
             object1=(JSONObject) JSONValue.parse(message);
 
@@ -32,7 +32,7 @@ public class NetWork {
         }
         else if(types.SignUp.equals(object1.get(types.type))){
             RequesSignUp(object1);
-        }
+        }else if(object1.get(types.type).equals(types.move))RequestToMove(object1);
     }
     public void RequesSignUp(JSONObject object) throws IOException {
         try {
@@ -72,17 +72,7 @@ public class NetWork {
             ErrorRespose(e);
         }
     }
-    public void RequestSignUp(JSONObject object) throws Exception{
-        try {
-            String Name=(String) object.get(types.Username);
-            String Email=(String) object.get(types.Email);
-            String PassWord=(String) object.get(types.Password);
-            dao.signup(Name,PassWord,Email);
-            offlineCount+=1;
-        }catch (Exception e){
-            ErrorRespose(e);
-        }
-    }
+
     public void ErrorRespose(Exception e) throws IOException {
         JSONObject object=new JSONObject();
         object.put(types.type,types.Error);
@@ -171,13 +161,16 @@ public class NetWork {
                     servers.get(i).user.Oppentment=server.user.name;
                     servers.get(i).user.name=server.user.Oppentment;
                     servers.get(i).user.Status=2;
+                    servers.get(i).dataOutputStream.writeUTF(object.toString());
+                    startGame(server,servers.get(i));
                 }else {
                     server.user.Oppentment=null;
                     server.user.Status=0;
                     servers.get(i).user.Oppentment=null;
                     servers.get(i).user.Status=0;
+                    servers.get(i).dataOutputStream.writeUTF(object.toString());
+
                 }
-                servers.get(i).dataOutputStream.writeUTF(object.toString());
                 sendlistplayer();
                 return;
             }
@@ -209,14 +202,39 @@ public class NetWork {
             }
 
     }
+    public void startGame(Server server1,Server server2)throws Exception{
+        int score1=dao.getscore(server.user.name);
+        int score2=dao.getscore(server.user.Oppentment);
+        JSONObject jsonObject =new JSONObject();
+        jsonObject.put(types.type,types.startGame);
+        jsonObject.put(types.pscore,score1);
+        jsonObject.put(types.opscore,score2);
+        server1.dataOutputStream.writeUTF(jsonObject.toString());
+        jsonObject =new JSONObject();
+        jsonObject.put(types.type,types.startGame);
+        jsonObject.put(types.opscore,score1);
+        jsonObject.put(types.pscore,score2);
+        server2.dataOutputStream.writeUTF(jsonObject.toString());
+    }
 
-    public void RequestToMove(JSONObject object){
-        String point =(String) object.get(types.point);
+
+    public void RequestToMove(JSONObject object) throws IOException {
+
+        for (int i = 0; i < servers.size(); i++) {
+            if (server.user.Oppentment.equals(servers.get(i).user.name)){
+                    servers.get(i).dataOutputStream.writeUTF(object.toString());
+            }
+        }
 
     }
 }
 
 class types {
+    public static String opscore="oscore";
+
+    public static String pscore="pscore";
+    public static String data = "data";
+    public static  String startGame="startGame";
     public static String Offline="Offline";
     public static String type = "type";
     public static String move = "move";
