@@ -43,6 +43,7 @@ public class NetWork {
             object=new JSONObject();
             object.put(types.type,types.Success);
             server.dataOutputStream.writeUTF(object.toString());
+            offlineCount+=1;
         }catch (Exception e){
             ErrorRespose(e);
         }

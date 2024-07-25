@@ -51,7 +51,7 @@ class ServerTest {
     }
     //test sign in
     @Test
-    public void signin_test() throws IOException {
+    public void signin_test() throws Exception {
         object.put(sample.types.type, sample.types.SignIn);
         object.put(sample.types.Username,"mostafa");
         object.put(sample.types.Password,"0");
@@ -61,6 +61,7 @@ class ServerTest {
 
         outputStream2.writeUTF(object.toString());
         System.out.println(inputStream2.readUTF());
+        Thread.sleep(5000);
     }
     @Test
     public void update_list() throws IOException, InterruptedException {
@@ -174,8 +175,8 @@ class ServerTest {
     @Test
     public void signup_test() throws IOException {
         object.put(sample.types.type, sample.types.SignUp);
-        object.put(sample.types.Username,"mostafaff");
-        object.put(sample.types.Email,"mostafaff@xx.com");
+        object.put(sample.types.Username,"mostafaeef");
+        object.put(sample.types.Email,"effe@xx.com");
         object.put(sample.types.Password,"0");
         outputStream.writeUTF(object.toString());
         System.out.println(inputStream.readUTF());
