@@ -314,5 +314,12 @@ return users;
         object.put(types.Message,types.move);
         return object;
     }
-
+//    public static  void parseMessage(String message)
+//    {
+//        JSONObject object= (JSONObject) JSONValue.parse(message);
+//        if (object.get(types.type).equals()){
+//
+//        }
+//
+//    }
 }

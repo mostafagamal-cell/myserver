@@ -18,6 +18,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 class View extends AnchorPane {
     boolean ee=false;
@@ -32,7 +34,7 @@ class View extends AnchorPane {
 
 
     public static ObservableList<User> userList = FXCollections.observableArrayList();
-    //protected  final TextField textField;
+    protected  final TextField textField;
   protected final Button SServerButton;
   protected final Button StoServerButton;
   protected final AnchorPane PlayerButton;
@@ -49,8 +51,10 @@ class View extends AnchorPane {
   protected final CategoryAxis categoryAxis;
   protected final NumberAxis numberAxis;
   protected final BarChart<String,Number> barChart;
+    protected final Label myip;
 
   public View(DAO dao) {
+      textField= new TextField();
       setStyle("-fx-background-image: url('/sample/back.jpg'); " +
               "-fx-background-size: cover; " +
               "-fx-background-position: center center;");
@@ -66,6 +70,7 @@ class View extends AnchorPane {
       circle1 = new Circle();
       label1 = new Label();
       offlinelabe = new Label();
+      myip = new Label("your ip is");
 
       users = new ListView<User>();
       categoryAxis = new CategoryAxis();
@@ -83,11 +88,19 @@ class View extends AnchorPane {
       setMaxWidth(USE_PREF_SIZE);
       setMinHeight(USE_PREF_SIZE);
       setMinWidth(USE_PREF_SIZE);
-
+      textField.setLayoutX(334.0);
+      textField.setLayoutY(414.0);
+      AnchorPane.setRightAnchor(myip, 270.0);
+        myip.setFont(new Font(30));
+      textField.setFont(new Font(20));
+        textField.setEditable(false);
+      AnchorPane.setRightAnchor(textField, 15.0);
       AnchorPane.setRightAnchor(SServerButton, 26.0);
       AnchorPane.setTopAnchor(SServerButton, 414.0);
-      SServerButton.setLayoutX(334.0);
-      SServerButton.setLayoutY(414.0);
+      textField.setLayoutX(204.0);
+      textField.setLayoutY(554.0);
+      myip.setLayoutX(104.0);
+      myip.setLayoutY(554.0);
       SServerButton.setMaxHeight(USE_PREF_SIZE);
       SServerButton.setMaxWidth(USE_PREF_SIZE);
       SServerButton.setMinHeight(USE_PREF_SIZE);
@@ -188,6 +201,8 @@ class View extends AnchorPane {
       users.setPrefWidth(480);
       StoServerButton.setDisable(true);
       getChildren().add(SServerButton);
+      getChildren().add(textField);
+      getChildren().add(myip);
       getChildren().add(StoServerButton);
       PlayerButton.getChildren().add(circle);
       PlayerButton.getChildren().add(label);
@@ -201,7 +216,11 @@ class View extends AnchorPane {
       getChildren().add(PlayerButton);
       getChildren().add(barChart);
       SServerButton.setOnAction(e->{
-          System.out.println("xxxxxxxxxxxxxxxxxx");
+          try {
+              textField.setText(InetAddress. getLocalHost().getHostAddress());
+          } catch (UnknownHostException unknownHostException) {
+              unknownHostException.printStackTrace();
+          }
           task2= new MyTask2();
           task= new MyTask();
           t= new Thread(task);
@@ -244,6 +263,7 @@ class View extends AnchorPane {
       });
       StoServerButton.setOnAction(e->{
           try {
+              textField.clear();
               offlineCount=0;
               onlineCount=0;
               inGameCount=0;
