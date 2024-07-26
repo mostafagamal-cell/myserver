@@ -210,7 +210,7 @@ class View extends AnchorPane {
           t2.setDaemon(true);
           t2.start();
           task2.messageProperty().addListener((observable, oldValue, newValue) -> {
-
+              System.out.println(newValue);
               Platform.runLater(()-> {
                   series1.setName("Offline");
                   series2.setName("InGame");

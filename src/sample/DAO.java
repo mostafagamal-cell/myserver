@@ -51,25 +51,27 @@ class DAO {
     public synchronized void addscore(String user) throws Exception {
         try {
             String updateScoreSQL = "UPDATE players SET score = score + 1 WHERE username ='"+user+"'";
-
             int st=    con.createStatement().executeUpdate(updateScoreSQL);
             if (st==0)throw new Exception("Not found");
         }catch (Exception e)
         {
+            System.out.println("bbbbbbbbbbbbb");
+
             throw e;
         }
     }
      public synchronized int getscore(String user) throws Exception {
          try {
-             String updateScoreSQL = "SELECT score  WHERE username ='"+user+"'";
+             String updateScoreSQL = "SELECT score FROM players   WHERE username ='"+user+"'";
              ResultSet set=con.createStatement().executeQuery(updateScoreSQL);
              if (set.next())
                  return set.getInt(1);
-                 throw new Exception("Not found");
          }catch (Exception e)
          {
+             System.out.println("hhhhhhhhhhhhhhhhhhhhhh");
              throw e;
          }
+         return -1;
      }
 
     public synchronized void checkindatabase(String email,String user) throws Exception {

@@ -43,25 +43,34 @@ class Server extends Thread {
             } catch (Exception e) {
                 Platform.runLater(() -> updateUIForUser(user.name, 0));
                 MainServer.servers.remove(this);
-               if (user.name!=null) {
-                   offlineCount += 1;
-                   onlineCount -= 1;
-               }
+                System.out.println(this.user.name+"  logout avialable "+ offlineCount+"  av"+onlineCount );
+                onlineCount=MainServer.servers.size();
+                if (user.name!=null) {
+                       offlineCount += 1;
+                }
+
                 if (user.Status==2)
                 {
                     try {
-                        netWork.sendwinng(user.name,user.Oppentment);
-                    } catch (IOException ioException) {
-                        ioException.printStackTrace();
+                        netWork.sendwinng();
+                    } catch (Exception ioException) {
+                        System.out.println("eeeeeeeeeeeee"+ioException.getMessage());
                     }
-                    inGameCount-=2;
+                        if (inGameCount>1)
+                            inGameCount-=2;
+                        else
+                            inGameCount=0;
                 }
-                System.out.println("logout "+user.name);
+
+                //     System.out.println("logout "+user.name);
+
                 try {
                     NetWork.sendlistplayer();
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
+                this.user.Oppentment=null;
+                this.user.Status=0;
                 closeConnections();
                 interrupt();
                 break; // Exit the loop if there's an error

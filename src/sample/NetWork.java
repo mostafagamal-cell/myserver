@@ -66,7 +66,7 @@ public class NetWork {
             server.dataOutputStream.writeUTF(object1.toString());
             System.out.println(servers.size());
             NetWork.sendlistplayer();
-            onlineCount+=1;
+            onlineCount=servers.size();
             offlineCount-=1;
         }catch (Exception e){
             ErrorRespose(e);
@@ -105,15 +105,12 @@ public class NetWork {
                     servers.get(i).user.Oppentment= server.user.name;
                     object1.put(types.Opponent, server.user.name);
                     servers.get(i).dataOutputStream.writeUTF(object1.toString());
+
                     sendlistplayer();
                     return;
                 }
             }
         }
-         object = responseBusy(types.Offline);
-        server.user.Status=0;
-        server.user.Oppentment=null;
-        server.dataOutputStream.writeUTF(object.toString());
     }
 
     private JSONObject responseBusy(String currentbusy) {
@@ -151,10 +148,8 @@ public class NetWork {
     }
 
     public  void  ResposeToPlay(JSONObject object) throws Exception {
-        String Opponent=(String)object.get(types.Message);
-        String player1= server.user.Oppentment;
+
         for (int i = 0; i < servers.size(); i++) {
-            String plyer2=servers.get(i).user.name;
             if (servers.get(i).user.name.equals(server.user.Oppentment)){
                 if (object.get(types.Message).equals(types.Accept)){
                     server.user.Status=2;
@@ -169,59 +164,55 @@ public class NetWork {
                     servers.get(i).user.Oppentment=null;
                     servers.get(i).user.Status=0;
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
-
                 }
                 sendlistplayer();
                 return;
             }
         }
     }
-    public void sendwinng(String winner,String loser) throws IOException, IOException {
-        for (int i = 0; i < servers.size(); i++) {
-            if (servers.get(i).user.name .equals(winner)){
-                JSONObject object = new JSONObject();
-                object.put(types.type,types.EndGame);
-                object.put(types.Message,types.YouWin);
-                servers.get(i).user.Oppentment=null;
-                servers.get(i).user.Status=0;
-                try {
-                    dao.addscore(server.user.name);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-                servers.get(i).dataOutputStream.writeUTF(object.toString());
-            }
-            if (servers.get(i).user.name .equals(loser)){
-                JSONObject object = new JSONObject();
-                object.put(types.type,types.EndGame);
-                object.put(types.Message,types.YouLose);
-                servers.get(i).user.Oppentment=null;
-                servers.get(i).user.Status=0;
-                servers.get(i).dataOutputStream.writeUTF(object.toString());
-            }
-            }
+            public void  sendwinng() throws Exception {
+                        JSONObject object = new JSONObject();
+                        object.put(types.type,types.EndGame);
+                        object.put(types.Message,types.YouWin);
+                for (int s = 0; s < servers.size(); s++) {
+                    if (servers.get(s).user.name.equals(server.user.Oppentment)){
+                        servers.get(s).dataOutputStream.writeUTF(object.toString());
+                        servers.get(s).user.Oppentment=null;
+                        servers.get(s).user.Status=0;
+                        dao.addscore(servers.get(s).user.name);
+                        System.out.println("------------>>>   "+servers.get(s).user.name);
+                    }
 
-    }
+                }
+
+
+            }
     public void startGame(Server server1,Server server2)throws Exception{
         int score1=dao.getscore(server.user.name);
         int score2=dao.getscore(server.user.Oppentment);
         JSONObject jsonObject =new JSONObject();
-        jsonObject.put(types.type,types.startGame);
-        jsonObject.put(types.pscore,score1);
-        jsonObject.put(types.opscore,score2);
+        createStartJson(score1, score2, jsonObject, types.pscore, types.opscore);
         server1.dataOutputStream.writeUTF(jsonObject.toString());
         jsonObject =new JSONObject();
-        jsonObject.put(types.type,types.startGame);
-        jsonObject.put(types.opscore,score1);
-        jsonObject.put(types.pscore,score2);
+        createStartJson(score1, score2, jsonObject, types.opscore, types.pscore);
+        inGameCount+=2;
+        onlineCount-=2;
+        System.out.println("xxxxxxxxxxxxxxxxxxx -> online"+onlineCount+" ingame "+inGameCount);
         server2.dataOutputStream.writeUTF(jsonObject.toString());
+    }
+
+    private void createStartJson(int score1, int score2, JSONObject jsonObject, String opscore, String pscore) {
+        jsonObject.put(types.type, types.startGame);
+        jsonObject.put(opscore, score1);
+        jsonObject.put(pscore, score2);
     }
 
 
     public void RequestToMove(JSONObject object) throws IOException {
-
         for (int i = 0; i < servers.size(); i++) {
             if (server.user.Oppentment.equals(servers.get(i).user.name)){
+
+                System.out.println(server.user.name+" -->  "+servers.get(i).user.name+" move : "+(String) object.get(types.point));
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
             }
         }
