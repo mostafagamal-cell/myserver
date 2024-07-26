@@ -52,6 +52,7 @@ class ServerTest {
         clint3.close();
     }
     //test sign in
+
     @Test
     public void signin_test() throws Exception {
         object.put(sample.types.type, sample.types.SignIn);
@@ -60,9 +61,7 @@ class ServerTest {
 
         outputStream.writeUTF(object.toString());
         System.out.println(inputStream.readUTF());
-
-        outputStream2.writeUTF(object.toString());
-        System.out.println(inputStream2.readUTF());
+        System.out.println(inputStream.readUTF());
         Thread.sleep(5000);
     }
     @Test
@@ -329,7 +328,6 @@ class ServerTest {
        JSONObject object= createSingin("mostafa","0");
        outputStream.writeUTF(object.toString());
        object= createSingin("gamal","0");
-
        outputStream2.writeUTF(object.toString());
         object= createSingin("z","0");
         outputStream3.writeUTF(object.toString());
@@ -351,8 +349,7 @@ class ServerTest {
         outputStream2.writeUTF(object.toString());
         System.out.println("mostafa 1 -->>  "+inputStream.readUTF());
         System.out.println("mostafa  2-->>  "+inputStream.readUTF());
-        System.out.println("mostafa  3-->>  "+inputStream.readUTF());
-        System.out.println("mostafa  4-->>  "+inputStream.readUTF());
+
         Thread.sleep(3000);
         outputStream2.close();
         inputStream2.close();

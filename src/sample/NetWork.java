@@ -24,6 +24,7 @@ public class NetWork {
             //
 
             String message=server.dataInputStream.readUTF();
+           System.out.println(message);
             object1=(JSONObject) JSONValue.parse(message);
 
         if (types.SignIn.equals(object1.get(types.type))) {
@@ -35,7 +36,31 @@ public class NetWork {
         }
         else if(types.SignUp.equals(object1.get(types.type))){
             RequesSignUp(object1);
-        }else if(object1.get(types.type).equals(types.move))RequestToMove(object1);
+        }else
+            if(object1.get(types.type).equals(types.move))RequestToMove(object1);
+            else if (types.type.equals(types.IWin)){
+                win();
+            }
+
+
+    }
+    public  void win() throws Exception {
+        dao.addscore(this.server.user.name);
+        JSONObject object = new JSONObject();
+        object.put(types.type,types.EndGame);
+        object.put(types.Message,types.YouWin);
+        this.server.user.Status=0;
+        update(this.server.user.name,0);
+        this.server.dataOutputStream.writeUTF(object.toString());
+        for (int i = 0; i < servers.size(); i++) {
+                if (this.server.user.Oppentment.equals(servers.get(i).user.name)){
+                    object.put(types.type,types.EndGame);
+                    object.put(types.Message,types.YouLose);
+                    servers.get(i).dataOutputStream.writeUTF(object.toString());
+                    servers.get(i).user.Status=0;
+                    update(servers.get(i).user.name,0);
+                }
+        }
     }
     public void RequesSignUp(JSONObject object) throws IOException {
         try {
@@ -43,11 +68,18 @@ public class NetWork {
             String email=  (String) object.get(types.Email);
             String pass=  (String) object.get(types.Password);
             dao.signup(name,pass,email);
+            User u = new User();
+            u.name=name;
+            u.email=email;
+            u.Score=0;
+            allUsers.add(u);
             object=new JSONObject();
             object.put(types.type,types.Success);
             server.dataOutputStream.writeUTF(object.toString());
             offlineCount+=1;
+            System.out.println(object.toString());
         }catch (Exception e){
+            System.out.println("eeeeeeeeeee- >>>>"+e.getMessage());
             ErrorRespose(e);
         }
     }
@@ -56,12 +88,20 @@ public class NetWork {
             String Name=(String) object.get(types.Username);
             String PassWord=(String) object.get(types.Password);
             dao.signin(Name,PassWord);
-            for (int i = 0; i < servers.size(); i++) {
-                if (servers.get(i).user.name.equals(Name)){
+            for (int i = 0; i < allUsers.size(); i++) {
+                if (allUsers.get(i).name.equals(Name)&&allUsers.get(i).Status!=-1){
                     throw  new Exception("user already exists");
                 }
             }
             this.server.user.name=Name;
+            for (int i = 0; i < allUsers.size(); i++) {
+                if (allUsers.get(i).name.equals(Name)){
+                    allUsers.get(i).Status=0;
+                    offlineCount-=1;
+
+                }
+            }
+
             servers.add(server);
             System.out.println(" name login "+server.user.name);
             JSONObject object1= new JSONObject();
@@ -70,12 +110,17 @@ public class NetWork {
             System.out.println(servers.size());
             NetWork.sendlistplayer();
             onlineCount=servers.size();
-            offlineCount-=1;
         }catch (Exception e){
             ErrorRespose(e);
         }
     }
-
+    public void update(String s,int x){
+        for (int i = 0; i < allUsers.size(); i++) {
+                if (allUsers.get(i).name.equals(s)){
+                    allUsers.get(i).Status=x;
+                }
+        }
+    }
     public void ErrorRespose(Exception e) throws IOException {
         JSONObject object=new JSONObject();
         object.put(types.type,types.Error);
@@ -94,6 +139,7 @@ public class NetWork {
                     object = responseBusy(types.Currentbusy);
                     server.user.Status=0;
                     server.user.Oppentment=null;
+                    update(server.user.name,0);
                     server.dataOutputStream.writeUTF(object.toString());
                     return;
                 }else if (servers.get(i).user.Status==2){
@@ -101,6 +147,7 @@ public class NetWork {
                      server.user.Status=0;
                      server.user.Oppentment=null;
                      server.dataOutputStream.writeUTF(object.toString());
+                    update(server.user.name,0);
                     return;
                 }else if (servers.get(i).user.Status==0){
                     JSONObject object1 = new JSONObject();
@@ -110,7 +157,7 @@ public class NetWork {
                     servers.get(i).user.Oppentment= server.user.name;
                     object1.put(types.Opponent, server.user.name);
                     servers.get(i).dataOutputStream.writeUTF(object1.toString());
-
+                    update(server.user.name,1);
                     sendlistplayer();
                     return;
                 }
@@ -131,16 +178,16 @@ public class NetWork {
         System.out.println("users in server"+servers.size());
         for (int i = 0; i < servers.size(); i++) {
             JSONArray array = new JSONArray();
-            for (int j = 0; j < servers.size(); j++) {
-                if (i == j) continue;
-                JSONObject object = new JSONObject();
-                object.put(types.Username, servers.get(j).user.name);
-                object.put(types.State, servers.get(j).user.Status);
-                array.add(object);
+            for (int j = 0; j < allUsers.size(); j++) {
+                if (allUsers.get(j).name.equals(servers.get(i).user.name)) continue;
+                    JSONObject object = new JSONObject();
+                    object.put(types.Username, allUsers.get(j).name);
+                    object.put(types.pscore,allUsers.get(j).Score);
+                    object.put(types.State, allUsers.get(j).Status);
+                    array.add(object);
             }
             System.out.println(" updated for  " + servers.get(i).user.name);
             JSONObject object2 = new JSONObject();
-            if (servers.size() > 1) {
                 try {
                     object2.put(types.type, types.UpdateList);
                     object2.put(types.List, array);
@@ -148,7 +195,7 @@ public class NetWork {
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
-            }
+
         }
     }
 
@@ -161,6 +208,7 @@ public class NetWork {
                     servers.get(i).user.Oppentment=server.user.name;
                     servers.get(i).user.name=server.user.Oppentment;
                     servers.get(i).user.Status=2;
+                    update(servers.get(i).user.name,2);
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
                     startGame(server,servers.get(i));
                 }else {
@@ -168,6 +216,7 @@ public class NetWork {
                     server.user.Status=0;
                     servers.get(i).user.Oppentment=null;
                     servers.get(i).user.Status=0;
+                    update(servers.get(i).user.name,0);
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
                 }
                 sendlistplayer();
@@ -223,7 +272,6 @@ public class NetWork {
 
 class types {
     public static String opscore="oscore";
-
     public static String pscore="pscore";
     public static String data = "data";
     public static  String startGame="startGame";
@@ -236,11 +284,11 @@ class types {
     public static String Error = "Error";
     public static String Message = "Message";
     public static String YouWin = "YouWin";
+    public static String IWin = "IWin";
     public static String EndGame = "EndGame";
     public static String Currentbusy = "Currentbusy";
     public static String CurrentInGame = "CurrentInGame";
     public static String List = "List";
-
     public static String YouLose = "YouLose";
     public static String SignIn = "SignIn";
     public static String SignUp = "SignUp";
@@ -284,10 +332,12 @@ return users;
     }
     public static JSONObject createsignup(String name , String password , String email){
         JSONObject object = new JSONObject();
+
         object.put(types.type,types.SignUp);
         object.put(types.Password,password);
         object.put(types.Email,email);
         object.put(types.Username,name);
+
         return object;
     }
     public static JSONObject createRequest(String opponent){
@@ -296,6 +346,7 @@ return users;
         object.put(types.Opponent,opponent);
         return object;
     }
+
     public static JSONObject responseAccept(){
         JSONObject object =new JSONObject();
         object.put(types.type,types.RequestToPlayResponse);

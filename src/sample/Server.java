@@ -10,10 +10,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import static sample.Main.dao;
+import static sample.MainServer.allUsers;
 import static sample.View.inGameCount;
 import static sample.View.offlineCount;
 import static sample.View.onlineCount;
-import static sample.View.userList;
+
 
 class Server extends Thread {
     NetWork netWork=new NetWork(dao,this);
@@ -41,12 +42,17 @@ class Server extends Thread {
                 user.online=true;
                 netWork.start();
             } catch (Exception e) {
-                Platform.runLater(() -> updateUIForUser(user.name, 0));
                 MainServer.servers.remove(this);
                 System.out.println(this.user.name+"  logout avialable "+ offlineCount+"  av"+onlineCount );
                 onlineCount=MainServer.servers.size();
                 if (user.name!=null) {
                        offlineCount += 1;
+                    for (int i = 0; i < allUsers.size(); i++) {
+                        if (allUsers.get(i).name.equals(user.name)){
+                            allUsers.get(i).Status=-1;
+                            break;
+                        }
+                    }
                 }
 
                 if (user.Status==2)
@@ -80,17 +86,7 @@ class Server extends Thread {
 
 
 
-    private void updateUIForUser(String username, int status) {
-        Platform.runLater(() -> {
-            for (User user : userList) {
-                if (user.name.equals(username)) {
-                    user.Status = status;
-                    userList.set(userList.indexOf(user), user); // Trigger ListView update
-                    break;
-                }
-            }
-        });
-    }
+
 
     private void closeConnections() {
         try {

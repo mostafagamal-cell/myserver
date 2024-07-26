@@ -5,8 +5,8 @@ package sample;
 import com.mysql.cj.jdbc.Driver;
 
 import java.sql.*;
+import java.util.ArrayList;
 
-import static sample.View.userList;
 
 
 class DAO {
@@ -131,17 +131,19 @@ class DAO {
             }
         }
     }
-    public   synchronized void getallsuers() throws Exception {
+    public   synchronized ArrayList<User> getallsuers() throws Exception {
         String query = "SELECT * FROM players";
         PreparedStatement preparedStatement= con.prepareStatement(query);
         ResultSet resultSet = preparedStatement.executeQuery();
-
+        ArrayList<User>uSers=new ArrayList<>();
         while (resultSet.next()){
             User n= new User();
             n.name=resultSet.getString(1);
             n.email=resultSet.getString(3);
-            userList.add(n);
+            n.Score=resultSet.getInt(4);
+            uSers.add(n);
         }
+        return uSers;
     }
     public synchronized Integer numberofpalyers() {
         try {

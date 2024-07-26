@@ -11,6 +11,7 @@ class MainServer extends  Thread{
     public    ServerSocket  serverSocket;
     public static Vector<Server>servers=new Vector<>();
     public  static IntegerProperty size = new SimpleIntegerProperty();
+    public static Vector<User>allUsers=new Vector<>();
 
     public MainServer() throws IOException {
         serverSocket = new ServerSocket(8000);

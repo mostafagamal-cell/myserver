@@ -33,7 +33,6 @@ class View extends AnchorPane {
     public static IntegerProperty property= new SimpleIntegerProperty();
 
 
-    public static ObservableList<User> userList = FXCollections.observableArrayList();
     protected  final TextField textField;
   protected final Button SServerButton;
   protected final Button StoServerButton;
@@ -47,7 +46,6 @@ class View extends AnchorPane {
   protected final Circle circle1;
   protected final Label label1;
   protected final Label offlinelabe;
-  protected final ListView<User> users;
   protected final CategoryAxis categoryAxis;
   protected final NumberAxis numberAxis;
   protected final BarChart<String,Number> barChart;
@@ -72,7 +70,7 @@ class View extends AnchorPane {
       offlinelabe = new Label();
       myip = new Label("your ip is");
 
-      users = new ListView<User>();
+
       categoryAxis = new CategoryAxis();
       numberAxis = new NumberAxis();
       barChart = new BarChart<String,Number>(categoryAxis, numberAxis);
@@ -82,8 +80,7 @@ class View extends AnchorPane {
       numberAxis.setLabel("Conuter");
 
 
-      users.setStyle("  -fx-background-color: transparent;\n" +
-              "    -fx-border-color: transparent; ");
+
       setMaxHeight(USE_PREF_SIZE);
       setMaxWidth(USE_PREF_SIZE);
       setMinHeight(USE_PREF_SIZE);
@@ -192,13 +189,6 @@ class View extends AnchorPane {
       XYChart.Series series2 = new XYChart.Series();
       XYChart.Series series1 = new XYChart.Series();
 
-      AnchorPane.setBottomAnchor(users, 1.0);
-      AnchorPane.setLeftAnchor(users, 11.0);
-      AnchorPane.setTopAnchor(users, 140.0);
-      users.setLayoutX(14.0);
-      users.setLayoutY(140.0);
-      users.setPrefHeight(90);
-      users.setPrefWidth(480);
       StoServerButton.setDisable(true);
       getChildren().add(SServerButton);
       getChildren().add(textField);
@@ -232,9 +222,6 @@ class View extends AnchorPane {
           task2.messageProperty().addListener((observable, oldValue, newValue) -> {
               System.out.println(newValue);
               Platform.runLater(()-> {
-                  series1.setName("Offline");
-                  series2.setName("InGame");
-                  series3.setName("Online");
 
                          series1.getData().add(new XYChart.Data("", offlineCount));
                          offlinelabe.setText(offlineCount + "");
@@ -249,13 +236,11 @@ class View extends AnchorPane {
           });
           task.valueProperty().addListener((observable, oldValue, newValue) -> Main.s =newValue);
           offlineCount=dao.numberofpalyers();
-
           StoServerButton.setDisable(false);
           SServerButton.setDisable(true);
           try {
-              dao.getallsuers();
-              users.setItems(userList);
-              users.setCellFactory(ez->new ListItem());
+            MainServer.allUsers.addAll( dao.getallsuers());
+
           } catch (Exception exception) {
               exception.printStackTrace();
           }
@@ -276,12 +261,13 @@ class View extends AnchorPane {
               ioException.printStackTrace();
           }
 
-          userList.clear();
-          users.setItems(userList);
+
           StoServerButton.setDisable(true);
           SServerButton.setDisable(false);
       });
-
+      series1.setName("Offline");
+      series2.setName("InGame");
+      series3.setName("Online");
       barChart.getData().addAll(series1,series2,series3);
 
   }
