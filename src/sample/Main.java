@@ -4,7 +4,9 @@ import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.json.simple.JSONObject;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class Main extends Application {
@@ -39,6 +41,31 @@ public class Main extends Application {
         });
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setOnCloseRequest(e->{
+            System.out.println("ttttttttttttttt");
+            for (int i = 0; i < MainServer.servers.size(); i++) {
+                try {
+                    JSONObject object  =new JSONObject();
+                    object.put(types.type,types.teardown);
+                    MainServer.servers.get(i).dataOutputStream.writeUTF(object.toString());
+                    MainServer.servers.get(i).dataInputStream.close();
+                    MainServer.servers.get(i).dataOutputStream.close();
+                    MainServer.servers.get(i).socket.close();
+
+                }catch (Exception ee){}
+            }
+            try {
+                dao.con.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            try {
+                if (MainServer.serverSocket!=null)
+                MainServer.serverSocket.close();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        });
     }
 
 

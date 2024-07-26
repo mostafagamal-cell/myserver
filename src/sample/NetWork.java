@@ -21,7 +21,6 @@ public class NetWork {
     public void start() throws Exception {
             JSONObject object1;
 
-            //
 
             String message=server.dataInputStream.readUTF();
            System.out.println(message);
@@ -40,12 +39,12 @@ public class NetWork {
             if(object1.get(types.type).equals(types.move))RequestToMove(object1);
             else if (types.type.equals(types.IWin)){
                 win();
-            }
+            }//else if (types.draw)
 
 
     }
     public  void win() throws Exception {
-        dao.addscore(this.server.user.name);
+        dao.addscore(this.server.user.name,3);
         JSONObject object = new JSONObject();
         object.put(types.type,types.EndGame);
         object.put(types.Message,types.YouWin);
@@ -61,6 +60,28 @@ public class NetWork {
                     update(servers.get(i).user.name,0);
                 }
         }
+        sendlistplayer();
+    }
+    public  void draw() throws Exception {
+        dao.addscore(this.server.user.name,1);
+        dao.addscore(this.server.user.Oppentment,1);
+        JSONObject object = new JSONObject();
+        object.put(types.type,types.EndGame);
+        object.put(types.Message,types.draw);
+        this.server.user.Status=0;
+        update(this.server.user.name,0);
+        this.server.dataOutputStream.writeUTF(object.toString());
+        for (int i = 0; i < servers.size(); i++) {
+            if (this.server.user.Oppentment.equals(servers.get(i).user.name)){
+                object.put(types.type,types.EndGame);
+                object.put(types.Message,types.YouLose);
+                servers.get(i).dataOutputStream.writeUTF(object.toString());
+                servers.get(i).user.Status=0;
+                update(servers.get(i).user.name,0);
+            }
+        }
+        sendlistplayer();
+
     }
     public void RequesSignUp(JSONObject object) throws IOException {
         try {
@@ -101,7 +122,6 @@ public class NetWork {
 
                 }
             }
-
             servers.add(server);
             System.out.println(" name login "+server.user.name);
             JSONObject object1= new JSONObject();
@@ -175,11 +195,11 @@ public class NetWork {
 
 
     public static synchronized   void  sendlistplayer()throws Exception{
-        System.out.println("users in server"+servers.size());
         for (int i = 0; i < servers.size(); i++) {
             JSONArray array = new JSONArray();
             for (int j = 0; j < allUsers.size(); j++) {
-                if (allUsers.get(j).name.equals(servers.get(i).user.name)) continue;
+                if (allUsers.get(j).name.equals(servers.get(i).user.name))
+                    continue;
                     JSONObject object = new JSONObject();
                     object.put(types.Username, allUsers.get(j).name);
                     object.put(types.pscore,allUsers.get(j).Score);
@@ -191,12 +211,14 @@ public class NetWork {
                 try {
                     object2.put(types.type, types.UpdateList);
                     object2.put(types.List, array);
+                    System.out.println(" ----->"+array);
                     servers.get(i).dataOutputStream.writeUTF(object2.toString());
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
 
         }
+
     }
 
     public  void  ResposeToPlay(JSONObject object) throws Exception {
@@ -233,7 +255,7 @@ public class NetWork {
                         servers.get(s).dataOutputStream.writeUTF(object.toString());
                         servers.get(s).user.Oppentment=null;
                         servers.get(s).user.Status=0;
-                        dao.addscore(servers.get(s).user.name);
+                        dao.addscore(servers.get(s).user.name,3);
                         System.out.println("------------>>>   "+servers.get(s).user.name);
                     }
 
@@ -271,6 +293,9 @@ public class NetWork {
 }
 
 class types {
+    public static String teardown="teardown";
+    public  static  String draw="draw";
+    public  static  String withdraw="withdraw";
     public static String opscore="oscore";
     public static String pscore="pscore";
     public static String data = "data";
@@ -324,7 +349,9 @@ class types {
             User user = new User();
             user.name=(String) ((JSONObject)jsonArray.get(i)).get(types.Username);
             Long xe=(Long) ((JSONObject)jsonArray.get(i)).get(types.State);
+            Long sc=(Long) ((JSONObject)jsonArray.get(i)).get(types.pscore);
             user.Status= Math.toIntExact(xe);
+            user.Score= Math.toIntExact(sc);
             users.add(user);
         }
         System.out.println(users.size());

@@ -18,7 +18,7 @@ import static sample.View.onlineCount;
 
 class Server extends Thread {
     NetWork netWork=new NetWork(dao,this);
-    private Socket socket;
+    public Socket socket;
     public DataInputStream dataInputStream;
     public DataOutputStream dataOutputStream;
     private ServerSocket serverSocket;

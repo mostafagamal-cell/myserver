@@ -48,9 +48,9 @@ class DAO {
             throw  new Exception("user name or email exists");
         }
     }
-    public synchronized void addscore(String user) throws Exception {
+    public synchronized void addscore(String user,int sc) throws Exception {
         try {
-            String updateScoreSQL = "UPDATE players SET score = score + 1 WHERE username ='"+user+"'";
+            String updateScoreSQL = "UPDATE players SET score = score + "+sc+" WHERE username ='"+user+"'";
             int st=    con.createStatement().executeUpdate(updateScoreSQL);
             if (st==0)throw new Exception("Not found");
         }catch (Exception e)

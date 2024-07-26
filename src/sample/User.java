@@ -7,4 +7,16 @@ package sample;
     public String Oppentment;
     boolean online;
     Integer Score;
-}
+
+    @Override
+    public String toString() {
+       return "User{" +
+               "name='" + name + '\'' +
+               ", email='" + email + '\'' +
+               ", Status=" + Status +
+               ", Oppentment='" + Oppentment + '\'' +
+               ", online=" + online +
+               ", Score=" + Score +
+               '}';
+    }
+ }

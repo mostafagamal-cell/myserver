@@ -8,9 +8,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 
-import static sample.types.createRequestToPlay;
-import static sample.types.createSingin;
+import static sample.types.*;
 
 class ServerTest {
     Socket clint;
@@ -165,14 +165,20 @@ class ServerTest {
     }
     @Test
     public void signin_with_exists_sigin_test() throws Exception {
+
+
         object.put(sample.types.type, sample.types.SignIn);
         object.put(sample.types.Username,"mostafa");
         object.put(sample.types.Password,"0");
         outputStream.writeUTF(object.toString());
         System.out.println(inputStream.readUTF());
-        outputStream2.writeUTF(object.toString());
-        System.out.println(inputStream2.readUTF());
-        Thread.sleep(7000 );
+        String masseg=inputStream.readUTF();
+        System.out.println();
+        ArrayList<User> usr=updateList(masseg);
+        for (int i = 0; i < usr.size(); i++) {
+            System.out.println(usr.get(i));
+        }
+        System.out.println(usr.size());
     }
     @Test
     public void signup_test() throws IOException, InterruptedException {
