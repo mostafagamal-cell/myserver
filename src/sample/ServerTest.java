@@ -178,8 +178,8 @@ class ServerTest {
     @Test
     public void signup_test() throws IOException, InterruptedException {
         object.put(sample.types.type, sample.types.SignUp);
-        object.put(sample.types.Username,"modsffafaeffef");
-        object.put(sample.types.Email,"eaeaasdffe@xx.com");
+        object.put(sample.types.Username,"modsffzzafaeffef");
+        object.put(sample.types.Email,"eaeaasdff77e@xx.com");
         object.put(sample.types.Password,"0");
         outputStream.writeUTF(object.toString());
         System.out.println(inputStream.readUTF());
@@ -345,26 +345,29 @@ class ServerTest {
         System.out.println("gamal  -->>  "+inputStream2.readUTF());
         System.out.println("gamal  -->>  "+inputStream2.readUTF());
         outputStream.writeUTF(createMove("00X").toString());
-        //System.out.println("gamal  -->>  "+inputStream2.readUTF());
-        //System.out.println("gamal  -->>  "+inputStream2.readUTF());
+        System.out.println("gamal 1 -->>  "+inputStream2.readUTF());
+     //   System.out.println("gamal 2-->>  "+inputStream2.readUTF());
         object=createMove("02O");
-
         outputStream2.writeUTF(object.toString());
-        System.out.println("mostafa  -->>  "+inputStream.readUTF());
-        System.out.println("mostafa  -->>  "+inputStream.readUTF());
-        System.out.println("mostafa  -->>  "+inputStream.readUTF());
-        System.out.println("mostafa  -->>  "+inputStream.readUTF());
+        System.out.println("mostafa 1 -->>  "+inputStream.readUTF());
+        System.out.println("mostafa  2-->>  "+inputStream.readUTF());
+        System.out.println("mostafa  3-->>  "+inputStream.readUTF());
+        System.out.println("mostafa  4-->>  "+inputStream.readUTF());
         Thread.sleep(3000);
         outputStream2.close();
         inputStream2.close();
         clint2.close();
         Thread.sleep(3000);
 
+        // ----> Erorr
+        // ----> Messges
+
+
         System.out.println("mostafa 1 -->>  "+inputStream.readUTF());
         System.out.println("mostafa 2 -->>  "+inputStream.readUTF());
         System.out.println("mostafa 3 -->>  "+inputStream.readUTF());
-      //  System.out.println("mostafa 4 -->>  "+inputStream.readUTF());
-        //System.out.println("mostafa 5 -->>  "+inputStream.readUTF());
+        System.out.println("mostafa 4 -->>  "+inputStream.readUTF());
+        System.out.println("mostafa 5 -->>  "+inputStream.readUTF());
 
         Thread.sleep(3000);
 

@@ -20,6 +20,9 @@ public class NetWork {
 
     public void start() throws Exception {
             JSONObject object1;
+
+            //
+
             String message=server.dataInputStream.readUTF();
             object1=(JSONObject) JSONValue.parse(message);
 
@@ -83,6 +86,8 @@ public class NetWork {
         String Opponent=(String)  object.get(types.Opponent);
         server.user.Oppentment=(String) object.get(types.Opponent);
         server.user.Status=1;
+        //  type --->   request top play
+        // Opponent  -->
         for (int i = 0; i < servers.size(); i++) {
             if (servers.get(i).user.name .equals(Opponent)){
                 if (servers.get(i).user.Status==1){
@@ -197,17 +202,13 @@ public class NetWork {
         createStartJson(score1, score2, jsonObject, types.opscore, types.pscore);
         inGameCount+=2;
         onlineCount-=2;
-        System.out.println("xxxxxxxxxxxxxxxxxxx -> online"+onlineCount+" ingame "+inGameCount);
         server2.dataOutputStream.writeUTF(jsonObject.toString());
     }
-
     private void createStartJson(int score1, int score2, JSONObject jsonObject, String opscore, String pscore) {
         jsonObject.put(types.type, types.startGame);
         jsonObject.put(opscore, score1);
         jsonObject.put(pscore, score2);
     }
-
-
     public void RequestToMove(JSONObject object) throws IOException {
         for (int i = 0; i < servers.size(); i++) {
             if (server.user.Oppentment.equals(servers.get(i).user.name)){
@@ -284,6 +285,34 @@ return users;
     public static JSONObject createsignup(String name , String password , String email){
         JSONObject object = new JSONObject();
         object.put(types.type,types.SignUp);
-return null;
+        object.put(types.Password,password);
+        object.put(types.Email,email);
+        object.put(types.Username,name);
+        return object;
     }
+    public static JSONObject createRequest(String opponent){
+        JSONObject object =new JSONObject();
+        object.put(types.type,types.RequestToPlay);
+        object.put(types.Opponent,opponent);
+        return object;
+    }
+    public static JSONObject responseAccept(){
+        JSONObject object =new JSONObject();
+        object.put(types.type,types.RequestToPlayResponse);
+        object.put(types.Message,types.Accept);
+        return object;
+    }
+    public static JSONObject responseRefuse(){
+        JSONObject object =new JSONObject();
+        object.put(types.type,types.RequestToPlayResponse);
+        object.put(types.Message,types.Refuse);
+        return object;
+    }
+    public static JSONObject sendMove( String move){
+        JSONObject object =new JSONObject();
+        object.put(types.type,types.move);
+        object.put(types.Message,types.move);
+        return object;
+    }
+
 }

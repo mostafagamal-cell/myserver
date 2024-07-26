@@ -12,6 +12,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
@@ -31,7 +32,7 @@ class View extends AnchorPane {
 
 
     public static ObservableList<User> userList = FXCollections.observableArrayList();
-
+    //protected  final TextField textField;
   protected final Button SServerButton;
   protected final Button StoServerButton;
   protected final AnchorPane PlayerButton;
