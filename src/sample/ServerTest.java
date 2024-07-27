@@ -60,9 +60,7 @@ class ServerTest {
         object.put(sample.types.Password,"0");
 
         outputStream.writeUTF(object.toString());
-        System.out.println(inputStream.readUTF());
-        System.out.println(inputStream.readUTF());
-        Thread.sleep(5000);
+       Thread.sleep(3000);
     }
     @Test
     public void update_list() throws IOException, InterruptedException {

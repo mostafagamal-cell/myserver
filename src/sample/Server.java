@@ -44,9 +44,9 @@ class Server extends Thread {
             } catch (Exception e) {
                 MainServer.servers.remove(this);
                 System.out.println(this.user.name+"  logout avialable "+ offlineCount+"  av"+onlineCount );
-                onlineCount=MainServer.servers.size();
                 if (user.name!=null) {
-                       offlineCount += 1;
+                        offlineCount += 1;
+                         onlineCount--;
                     for (int i = 0; i < allUsers.size(); i++) {
                         if (allUsers.get(i).name.equals(user.name)){
                             allUsers.get(i).Status=-1;
@@ -57,6 +57,7 @@ class Server extends Thread {
 
                 if (user.Status==2)
                 {
+                    onlineCount+=2;
                     try {
                         netWork.sendwinng();
                     } catch (Exception ioException) {

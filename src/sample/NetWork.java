@@ -122,22 +122,22 @@ public class NetWork {
                 }
             }
             this.server.user.name=Name;
-            for (int i = 0; i < allUsers.size(); i++) {
-                if (allUsers.get(i).name.equals(Name)){
-                    allUsers.get(i).Status=0;
-                    offlineCount-=1;
-
-                }
-            }
+//            for (int i = 0; i < allUsers.size(); i++) {
+//                if (allUsers.get(i).name.equals(Name)){
+//                    allUsers.get(i).Status=0;
+//                    offlineCount-=1;
+//
+//                }
+//            }
             server.user.Status=0;
             servers.add(server);
             System.out.println(" name login "+server.user.name);
             JSONObject object1= new JSONObject();
             object1.put(types.type,types.Success);
             server.dataOutputStream.writeUTF(object1.toString());
-            System.out.println(servers.size());
            // sendlistplayer();
-            onlineCount=servers.size();
+            onlineCount++;
+            offlineCount--;
         }catch (Exception e){
             ErrorRespose(e);
         }
@@ -175,7 +175,6 @@ public class NetWork {
         server.user.Oppentment=(String) object.get(types.Opponent);
         server.user.Status=1;
 
-        System.out.println("called for "+server.user.name);
         for (int i = 0; i < servers.size(); i++) {
             String ss=servers.get(i).user.name;
             if (servers.get(i).user.name.equals(Opponent)){
@@ -187,6 +186,7 @@ public class NetWork {
                     server.user.Oppentment=null;
                     update(server.user.name,0);
                     server.dataOutputStream.writeUTF(object.toString());
+
                     return;
                 }else if (servers.get(i).user.Status==2){
                      object = responseBusy(types.CurrentInGame);
@@ -259,6 +259,8 @@ public class NetWork {
                     servers.get(i).user.Status=2;
                     update(servers.get(i).user.name,2);
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
+                    inGameCount+=2;
+                    onlineCount-=2;
                 }else {
                     System.out.println("jjjjjjjjjjjjjjjjjjjj");
                     server.user.Oppentment=null;
