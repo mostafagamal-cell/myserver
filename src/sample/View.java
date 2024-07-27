@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -247,17 +248,29 @@ class View extends AnchorPane {
       });
       StoServerButton.setOnAction(e->{
           try {
-              MainServer.servers.clear();
-              textField.clear();
+
               offlineCount=0;
               onlineCount=0;
               inGameCount=0;
+              System.out.println("ttttttttttttttt");
+              for (int i = 0; i < MainServer.servers.size(); i++) {
+                  try {
+                      JSONObject object  =new JSONObject();
 
-              Main.s.serverSocket.close();
+                      object.put(types.type,types.teardown);
+                      MainServer.servers.get(i).dataOutputStream.writeUTF(object.toString());
+
+                      MainServer.servers.get(i).dataInputStream.close();
+                      MainServer.servers.get(i).dataOutputStream.close();
+                      MainServer.servers.get(i).socket.close();
+                  }catch (Exception ee){}
+              }
+              MainServer.servers.clear();
+              textField.clear();
               t.stop();
               t2.stop();
 
-          } catch (IOException ioException) {
+          } catch (Exception ioException) {
               ioException.printStackTrace();
           }
 

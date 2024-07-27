@@ -163,8 +163,6 @@ class ServerTest {
     }
     @Test
     public void signin_with_exists_sigin_test() throws Exception {
-
-
         object.put(sample.types.type, sample.types.SignIn);
         object.put(sample.types.Username,"mostafa");
         object.put(sample.types.Password,"0");

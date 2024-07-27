@@ -46,8 +46,12 @@ public class Main extends Application {
             for (int i = 0; i < MainServer.servers.size(); i++) {
                 try {
                     JSONObject object  =new JSONObject();
+
                     object.put(types.type,types.teardown);
                     MainServer.servers.get(i).dataOutputStream.writeUTF(object.toString());
+
+
+
                     MainServer.servers.get(i).dataInputStream.close();
                     MainServer.servers.get(i).dataOutputStream.close();
                     MainServer.servers.get(i).socket.close();

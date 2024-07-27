@@ -143,7 +143,11 @@ public class NetWork {
         }
     }
     public void update(String s,int x){
-
+        for (int i = 0; i < allUsers.size(); i++) {
+            if (allUsers.get(i).name.equals(s)){
+                allUsers.get(i).Status=x;
+            }
+        }
     }
     public  void withdraw() throws Exception {
        String opp= this.server.user.Oppentment;
@@ -304,9 +308,9 @@ public class NetWork {
         // type -> move
         // message -> 00X  , 01O
         for (int i = 0; i < servers.size(); i++) {
-            if (server.user.Oppentment.equals(servers.get(i).user.name)){
-                System.out.println(server.user.name+" -->  "+servers.get(i).user.name+" move : "+(String) object.get(types.point));
-                    servers.get(i).dataOutputStream.writeUTF(object.toString());
+            if (server.user.Oppentment.equals(servers.get(i).user.name)) {
+                System.out.println(server.user.name + " -->  " + servers.get(i).user.name + " move : " + (String) object.get(types.type)+"------------>"+object.toString());
+                servers.get(i).dataOutputStream.writeUTF(object.toString());
             }
         }
     }
