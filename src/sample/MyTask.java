@@ -11,9 +11,9 @@ class MyTask extends Task<MainServer> {
     }
 }
 
-class MyTask2 extends Task<MainServer> {
+class MyTask2 extends Task<String> {
     @Override
-    protected MainServer call()  {
+    protected String call()  {
         while (true){
          //   System.out.println(offlineCount+" "+onlineCount+" "+inGameCount);
             updateMessage(offlineCount+" "+onlineCount+" "+inGameCount);

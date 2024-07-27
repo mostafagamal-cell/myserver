@@ -219,6 +219,7 @@ class View extends AnchorPane {
           t.start();
           t2.setDaemon(true);
           t2.start();
+
           task2.messageProperty().addListener((observable, oldValue, newValue) -> {
               System.out.println(newValue);
               Platform.runLater(()-> {
@@ -231,8 +232,6 @@ class View extends AnchorPane {
                          onlinelabe.setText(onlineCount + "");
 
               });
-
-
           });
           task.valueProperty().addListener((observable, oldValue, newValue) -> Main.s =newValue);
           offlineCount=dao.numberofpalyers();
@@ -248,6 +247,7 @@ class View extends AnchorPane {
       });
       StoServerButton.setOnAction(e->{
           try {
+              MainServer.servers.clear();
               textField.clear();
               offlineCount=0;
               onlineCount=0;

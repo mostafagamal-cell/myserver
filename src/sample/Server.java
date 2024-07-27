@@ -71,7 +71,7 @@ class Server extends Thread {
                 //     System.out.println("logout "+user.name);
 
                 try {
-                    NetWork.sendlistplayer();
+                  //  NetWork.sendlistplayer();
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }

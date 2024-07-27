@@ -20,12 +20,11 @@ public class NetWork {
 
     public void start() throws Exception {
             JSONObject object1;
-
+            // type --> withdraw
 
             String message=server.dataInputStream.readUTF();
-           System.out.println(message);
+            System.out.println(message);
             object1=(JSONObject) JSONValue.parse(message);
-
         if (types.SignIn.equals(object1.get(types.type))) {
             RequestSignIng(object1);
         }else if(types.RequestToPlay.equals(object1.get(types.type))){
@@ -39,7 +38,10 @@ public class NetWork {
             if(object1.get(types.type).equals(types.move))RequestToMove(object1);
             else if (types.type.equals(types.IWin)){
                 win();
-            }//else if (types.draw)
+            } else if (object1.get(types.type).equals("List")){
+                System.out.println(server.user.name+" ask to up date list");
+                sendlistplayer();
+            }
 
 
     }
@@ -58,9 +60,14 @@ public class NetWork {
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
                     servers.get(i).user.Status=0;
                     update(servers.get(i).user.name,0);
+                    update(this.server.user.name,0);
+                    // -1 offline
+                    // 0  online
+                    // 1 request
+                    // 2 in game
                 }
         }
-        sendlistplayer();
+      //  sendlistplayer();
     }
     public  void draw() throws Exception {
         dao.addscore(this.server.user.name,1);
@@ -80,7 +87,7 @@ public class NetWork {
                 update(servers.get(i).user.name,0);
             }
         }
-        sendlistplayer();
+        //sendlistplayer();
 
     }
     public void RequesSignUp(JSONObject object) throws IOException {
@@ -109,8 +116,8 @@ public class NetWork {
             String Name=(String) object.get(types.Username);
             String PassWord=(String) object.get(types.Password);
             dao.signin(Name,PassWord);
-            for (int i = 0; i < allUsers.size(); i++) {
-                if (allUsers.get(i).name.equals(Name)&&allUsers.get(i).Status!=-1){
+            for (int i = 0; i < servers.size(); i++) {
+                if (servers.get(i).user.name.equals(Name)){
                     throw  new Exception("user already exists");
                 }
             }
@@ -122,25 +129,41 @@ public class NetWork {
 
                 }
             }
+            server.user.Status=0;
             servers.add(server);
             System.out.println(" name login "+server.user.name);
             JSONObject object1= new JSONObject();
             object1.put(types.type,types.Success);
             server.dataOutputStream.writeUTF(object1.toString());
             System.out.println(servers.size());
-            NetWork.sendlistplayer();
+           // sendlistplayer();
             onlineCount=servers.size();
         }catch (Exception e){
             ErrorRespose(e);
         }
     }
     public void update(String s,int x){
-        for (int i = 0; i < allUsers.size(); i++) {
-                if (allUsers.get(i).name.equals(s)){
-                    allUsers.get(i).Status=x;
-                }
+
+    }
+    public  void withdraw() throws Exception {
+       String opp= this.server.user.Oppentment;
+        for (int i = 0; i < servers.size(); i++) {
+            if (servers.get(i).user.equals(opp)){
+                JSONObject object = new JSONObject();
+                object.put(types.type,types.EndGame);
+                object.put(types.Message,types.YouWin);
+                dao.addscore(opp,3);
+                servers.get(i).dataOutputStream.writeUTF(object.toString());
+                servers.get(i).user.Status=0;
+                servers.get(i).user.Oppentment=null;
+                this.server.user.Status=0;
+                this.server.user.Oppentment=null;
+                update(opp,0);
+                update(servers.get(i).user.name,0);
+            }
         }
     }
+
     public void ErrorRespose(Exception e) throws IOException {
         JSONObject object=new JSONObject();
         object.put(types.type,types.Error);
@@ -151,11 +174,14 @@ public class NetWork {
         String Opponent=(String)  object.get(types.Opponent);
         server.user.Oppentment=(String) object.get(types.Opponent);
         server.user.Status=1;
-        //  type --->   request top play
-        // Opponent  -->
+
+        System.out.println("called for "+server.user.name);
         for (int i = 0; i < servers.size(); i++) {
-            if (servers.get(i).user.name .equals(Opponent)){
+            String ss=servers.get(i).user.name;
+            if (servers.get(i).user.name.equals(Opponent)){
+                System.out.println(servers.get(i).user);
                 if (servers.get(i).user.Status==1){
+                    System.out.println("----------sss"+servers.get(i).user);
                     object = responseBusy(types.Currentbusy);
                     server.user.Status=0;
                     server.user.Oppentment=null;
@@ -170,6 +196,7 @@ public class NetWork {
                     update(server.user.name,0);
                     return;
                 }else if (servers.get(i).user.Status==0){
+                    System.out.println("send request from "+ server.user.name+" to "+ servers.get(i).user.name );
                     JSONObject object1 = new JSONObject();
                     server.user.Oppentment=servers.get(i).user.name;
                     object1.put(types.type, types.RequestToPlay);
@@ -178,7 +205,7 @@ public class NetWork {
                     object1.put(types.Opponent, server.user.name);
                     servers.get(i).dataOutputStream.writeUTF(object1.toString());
                     update(server.user.name,1);
-                    sendlistplayer();
+
                     return;
                 }
             }
@@ -194,11 +221,11 @@ public class NetWork {
     }
 
 
-    public static synchronized   void  sendlistplayer()throws Exception{
-        for (int i = 0; i < servers.size(); i++) {
+    public  synchronized   void  sendlistplayer()throws Exception{
+        System.out.println("Sended");
             JSONArray array = new JSONArray();
             for (int j = 0; j < allUsers.size(); j++) {
-                if (allUsers.get(j).name.equals(servers.get(i).user.name))
+                if (allUsers.get(j).name.equals(this.server.user.name))
                     continue;
                     JSONObject object = new JSONObject();
                     object.put(types.Username, allUsers.get(j).name);
@@ -206,23 +233,23 @@ public class NetWork {
                     object.put(types.State, allUsers.get(j).Status);
                     array.add(object);
             }
-            System.out.println(" updated for  " + servers.get(i).user.name);
             JSONObject object2 = new JSONObject();
                 try {
                     object2.put(types.type, types.UpdateList);
                     object2.put(types.List, array);
                     System.out.println(" ----->"+array);
-                    servers.get(i).dataOutputStream.writeUTF(object2.toString());
+                    this.server.dataOutputStream.writeUTF(object2.toString());
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
 
-        }
+
 
     }
 
     public  void  ResposeToPlay(JSONObject object) throws Exception {
-
+        System.out.println("-->>>>>>>>>>>>>>>"+object.toString());
+        object.put(types.type,types.RequestToPlayResponse);
         for (int i = 0; i < servers.size(); i++) {
             if (servers.get(i).user.name.equals(server.user.Oppentment)){
                 if (object.get(types.Message).equals(types.Accept)){
@@ -232,16 +259,17 @@ public class NetWork {
                     servers.get(i).user.Status=2;
                     update(servers.get(i).user.name,2);
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
-                    startGame(server,servers.get(i));
                 }else {
+                    System.out.println("jjjjjjjjjjjjjjjjjjjj");
                     server.user.Oppentment=null;
                     server.user.Status=0;
                     servers.get(i).user.Oppentment=null;
                     servers.get(i).user.Status=0;
+                    update(server.user.name,0);
                     update(servers.get(i).user.name,0);
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
                 }
-                sendlistplayer();
+                //sendlistplayer();
                 return;
             }
         }
@@ -263,32 +291,22 @@ public class NetWork {
 
 
             }
-    public void startGame(Server server1,Server server2)throws Exception{
-        int score1=dao.getscore(server.user.name);
-        int score2=dao.getscore(server.user.Oppentment);
-        JSONObject jsonObject =new JSONObject();
-        createStartJson(score1, score2, jsonObject, types.pscore, types.opscore);
-        server1.dataOutputStream.writeUTF(jsonObject.toString());
-        jsonObject =new JSONObject();
-        createStartJson(score1, score2, jsonObject, types.opscore, types.pscore);
-        inGameCount+=2;
-        onlineCount-=2;
-        server2.dataOutputStream.writeUTF(jsonObject.toString());
-    }
+
     private void createStartJson(int score1, int score2, JSONObject jsonObject, String opscore, String pscore) {
         jsonObject.put(types.type, types.startGame);
         jsonObject.put(opscore, score1);
         jsonObject.put(pscore, score2);
     }
+
     public void RequestToMove(JSONObject object) throws IOException {
+        // type -> move
+        // message -> 00X  , 01O
         for (int i = 0; i < servers.size(); i++) {
             if (server.user.Oppentment.equals(servers.get(i).user.name)){
-
                 System.out.println(server.user.name+" -->  "+servers.get(i).user.name+" move : "+(String) object.get(types.point));
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
             }
         }
-
     }
 }
 
@@ -389,7 +407,7 @@ return users;
     public static JSONObject sendMove( String move){
         JSONObject object =new JSONObject();
         object.put(types.type,types.move);
-        object.put(types.Message,types.move);
+        object.put(types.Message,move);
         return object;
     }
 //    public static  void parseMessage(String message)
