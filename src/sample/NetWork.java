@@ -34,31 +34,37 @@ public class NetWork {
         }
         else if(types.SignUp.equals(object1.get(types.type))){
             RequesSignUp(object1);
-        }else
-            if(object1.get(types.type).equals(types.move))RequestToMove(object1);
-            else if (types.type.equals(types.IWin)){
+        }else if(object1.get(types.type).equals(types.move))RequestToMove(object1);
+            else if (object1.get(types.type).equals(types.IWin)){
                 win();
             } else if (object1.get(types.type).equals("List")){
                 System.out.println(server.user.name+" ask to up date list");
                 sendlistplayer();
             }
+            else if (object1.get(types.type).equals(types.draw)){
+                draw();
+            }
 
 
     }
     public  void win() throws Exception {
+        System.out.println(server.user.name+ " win "+server.user.Oppentment+" lose");
         dao.addscore(this.server.user.name,3);
         JSONObject object = new JSONObject();
         object.put(types.type,types.EndGame);
         object.put(types.Message,types.YouWin);
+        this.server.dataOutputStream.writeUTF(object.toString());
         this.server.user.Status=0;
         update(this.server.user.name,0);
-        this.server.dataOutputStream.writeUTF(object.toString());
         for (int i = 0; i < servers.size(); i++) {
                 if (this.server.user.Oppentment.equals(servers.get(i).user.name)){
+                    object = new JSONObject();
                     object.put(types.type,types.EndGame);
                     object.put(types.Message,types.YouLose);
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
                     servers.get(i).user.Status=0;
+                    servers.get(i).user.Oppentment=null;
+
                     update(servers.get(i).user.name,0);
                     update(this.server.user.name,0);
                     // -1 offline
@@ -67,7 +73,10 @@ public class NetWork {
                     // 2 in game
                 }
         }
-      //  sendlistplayer();
+        server.user.Oppentment=null;
+        onlineCount+=2;
+        inGameCount-=2;
+        //  sendlistplayer();
     }
     public  void draw() throws Exception {
         dao.addscore(this.server.user.name,1);
@@ -76,17 +85,22 @@ public class NetWork {
         object.put(types.type,types.EndGame);
         object.put(types.Message,types.draw);
         this.server.user.Status=0;
+        update(this.server.user.Oppentment,0);
+
         update(this.server.user.name,0);
         this.server.dataOutputStream.writeUTF(object.toString());
         for (int i = 0; i < servers.size(); i++) {
             if (this.server.user.Oppentment.equals(servers.get(i).user.name)){
                 object.put(types.type,types.EndGame);
-                object.put(types.Message,types.YouLose);
+                object.put(types.Message,types.draw);
                 servers.get(i).dataOutputStream.writeUTF(object.toString());
                 servers.get(i).user.Status=0;
                 update(servers.get(i).user.name,0);
             }
         }
+        server.user.Oppentment=null;
+        onlineCount+=2;
+        inGameCount-=2;
         //sendlistplayer();
 
     }
@@ -136,6 +150,7 @@ public class NetWork {
             object1.put(types.type,types.Success);
             server.dataOutputStream.writeUTF(object1.toString());
            // sendlistplayer();
+            update(this.server.user.name,0);
             onlineCount++;
             offlineCount--;
         }catch (Exception e){
@@ -225,6 +240,13 @@ public class NetWork {
     }
 
 
+    // type -->  Iwin
+
+
+
+    // type -->  EndofGame
+    // Message  -- > YouWin   , YouLOse
+
     public  synchronized   void  sendlistplayer()throws Exception{
         System.out.println("Sended");
             JSONArray array = new JSONArray();
@@ -261,7 +283,11 @@ public class NetWork {
                     servers.get(i).user.Oppentment=server.user.name;
                     servers.get(i).user.name=server.user.Oppentment;
                     servers.get(i).user.Status=2;
+
+                    // type --> Iwin
+                    //typ
                     update(servers.get(i).user.name,2);
+                    update(this.server.user.name,2);
                     servers.get(i).dataOutputStream.writeUTF(object.toString());
                     inGameCount+=2;
                     onlineCount-=2;
@@ -292,9 +318,9 @@ public class NetWork {
                         dao.addscore(servers.get(s).user.name,3);
                         System.out.println("------------>>>   "+servers.get(s).user.name);
                     }
-
                 }
-
+                onlineCount+=2;
+                inGameCount-=2;
 
             }
 
@@ -317,6 +343,7 @@ public class NetWork {
 }
 
 class types {
+
     public static String teardown="teardown";
     public  static  String draw="draw";
     public  static  String withdraw="withdraw";

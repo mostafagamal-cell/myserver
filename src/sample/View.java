@@ -249,9 +249,6 @@ class View extends AnchorPane {
       StoServerButton.setOnAction(e->{
           try {
 
-              offlineCount=0;
-              onlineCount=0;
-              inGameCount=0;
               System.out.println("ttttttttttttttt");
               for (int i = 0; i < MainServer.servers.size(); i++) {
                   try {
@@ -274,7 +271,9 @@ class View extends AnchorPane {
               ioException.printStackTrace();
           }
 
-
+          offlineCount=0;
+          onlineCount=0;
+          inGameCount=0;
           StoServerButton.setDisable(true);
           SServerButton.setDisable(false);
       });

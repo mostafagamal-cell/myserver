@@ -44,7 +44,7 @@ class Server extends Thread {
             } catch (Exception e) {
                 MainServer.servers.remove(this);
                 System.out.println(this.user.name+"  logout avialable "+ offlineCount+"  av"+onlineCount );
-                if (user.name!=null) {
+                if (this.user.name!=null) {
                         offlineCount += 1;
                          onlineCount--;
                     for (int i = 0; i < allUsers.size(); i++) {
@@ -54,19 +54,14 @@ class Server extends Thread {
                         }
                     }
                 }
-
                 if (user.Status==2)
                 {
-                    onlineCount+=2;
                     try {
                         netWork.sendwinng();
                     } catch (Exception ioException) {
                         System.out.println("eeeeeeeeeeeee"+ioException.getMessage());
                     }
-                        if (inGameCount>1)
-                            inGameCount-=2;
-                        else
-                            inGameCount=0;
+
                 }
 
                 //     System.out.println("logout "+user.name);
